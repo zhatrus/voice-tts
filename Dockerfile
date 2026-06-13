@@ -38,7 +38,9 @@ VOLUME ["/home/app/.cache/huggingface", "/data"]
 
 EXPOSE 8000
 
-HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+# start-period covers model load on startup, when heavy CPU work can briefly
+# starve the health endpoint and cause false "unhealthy".
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 --start-period=180s \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5)" || exit 1
 
 CMD ["python", "-m", "app.main"]
