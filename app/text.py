@@ -9,6 +9,7 @@ import logging
 import re
 from unicodedata import normalize as unicode_normalize
 
+from . import normalize as norm
 from . import verbalizer as verb
 
 logger = logging.getLogger("app.text")
@@ -60,6 +61,10 @@ def to_ipa_chunks(text: str, verbalize: bool = True) -> list[str]:
         part = part.strip()
         if not part:
             continue
+        # deterministic pass first: digits -> words, Latin -> Cyrillic (the
+        # stress/IPA stages are Cyrillic-only); the ML verbalizer then only
+        # handles what is left (dates, currency phrasing)
+        part = norm.apply(part)
         if verbalize:
             part = verb.verbalize(part)
         sentence = _normalize_sentence(part)

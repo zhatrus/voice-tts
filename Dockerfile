@@ -31,6 +31,10 @@ COPY app/requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip \
  && pip install --no-cache-dir -r /tmp/requirements.txt
 
+# text normalization (app/normalize.py); a separate layer so the heavy
+# torch/StyleTTS2 layer above stays cached on rebuilds
+RUN pip install --no-cache-dir num2words
+
 COPY app /home/app/app
 
 RUN mkdir -p /data /home/app/.cache/huggingface

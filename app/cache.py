@@ -13,7 +13,9 @@ logger = logging.getLogger("app.cache")
 
 
 def _key(text: str, voice: str, speed: float, fmt: str, sample_rate: int) -> str:
-    raw = f"{text}\x00{voice}\x00{speed}\x00{fmt}\x00{sample_rate}"
+    # "v2": text normalization changed how the same request sounds (digits ->
+    # words, Latin -> Cyrillic); the salt keeps stale pre-fix audio unreachable.
+    raw = f"v2\x00{text}\x00{voice}\x00{speed}\x00{fmt}\x00{sample_rate}"
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
